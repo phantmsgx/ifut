@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iFut - Elite</title>
+    <style>
+        :root { --team-color: #2563eb; }
+        body { 
+            font-family: sans-serif; 
+            background: #f8fafc; 
+            margin: 0; 
+            display: flex; flex-direction: column; min-height: 100vh; 
+        }
+        .hidden { display: none !important; }
+        
+        /* Onboarding */
+        #onboarding { padding: 40px 20px; text-align: center; }
+        .logo { font-size: 40px; font-weight: 900; color: #2563eb; font-style: italic; margin: 0; }
+        .grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; 
+            max-width: 400px; margin: 20px auto; 
+        }
+        .btn-team { 
+            background: white; border: 1px solid #e2e8f0; padding: 20px; 
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+        }
+
+        /* App */
+        header { background: white; padding: 20px; border-bottom: 2px solid var(--team-color); display: flex; justify-content: space-between; }
+        .card { 
+            background: white; margin: 20px; padding: 30px; 
+            border-radius: 30px; border-left: 10px solid var(--team-color);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <section id="onboarding">
+        <h1 class="logo">iFut</h1>
+        <p style="color: #64748b; font-weight: bold; letter-spacing: 2px;">PREMIUM</p>
+        <div class="grid" id="grid"></div>
+    </section>
+
+    <div id="main-app" class="hidden">
+        <header>
+            <span style="font-weight: 900; color: var(--team-color);">iFut</span>
+            <button onclick="localStorage.clear(); location.reload();">Sair</button>
+        </header>
+        <div class="card">
+            <p style="font-size: 12px; color: #94a3b8; font-weight: bold;">TIME SELECIONADO</p>
+            <h2 id="name" style="font-size: 30px; margin: 5px 0;">---</h2>
+        </div>
+    </div>
+
+    <script>
+        const clubes = [
+            { n: 'Palmeiras', c: '#059669' },
+            { n: 'Flamengo', c: '#dc2626' },
+            { n: 'Botafogo', c: '#000000' },
+            { n: 'Corinthians', c: '#333333' },
+            { n: 'Cruzeiro', c: '#1d4ed8' },
+            { n: 'São Paulo', c: '#ff0000' }
+        ];
+
+        function start() {
+            const saved = localStorage.getItem('ifut_team');
+            if (saved) {
+                showApp(JSON.parse(saved));
+            } else {
+                const container = document.getElementById('grid');
+                clubes.forEach(t => {
+                    const b = document.createElement('button');
+                    b.className = 'btn-team';
+                    b.innerText = t.n;
+                    b.onclick = () => {
+                        localStorage.setItem('ifut_team', JSON.stringify(t));
+                        showApp(t);
+                    };
+                    container.appendChild(b);
+                });
+            }
+        }
+
+        function showApp(t) {
+            document.getElementById('onboarding').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('name').innerText = t.n;
+            document.documentElement.style.setProperty('--team-color', t.c);
+        }
+
+        start();
+    </script>
+</body>
+</html>
