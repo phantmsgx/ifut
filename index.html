@@ -3,173 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iFut - Live Stats</title>
+    <title>iFut - Elite System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --team-color: #2563eb; --team-light: #eff6ff; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f8fafc; margin: 0; color: #0f172a; }
+        :root { --team-color: #2563eb; --team-bg: #eff6ff; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f8fafc; margin: 0; color: #0f172a; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
 
-        /* Estilo Auth & Onboarding */
+        /* Auth */
         .screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box; }
         .logo { font-size: 50px; font-weight: 900; font-style: italic; color: #2563eb; letter-spacing: -3px; margin: 0; }
+        .input-group { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+        input { padding: 18px; border-radius: 18px; border: 2px solid #f1f5f9; font-weight: 600; outline: none; transition: 0.3s; font-size: 16px; }
+        input:focus { border-color: #cbd5e1; }
+        .btn-main { background: #2563eb; color: white; padding: 20px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+
+        /* Onboarding Grid */
         .grid-teams { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 450px; margin-top: 25px; }
         .card-team { background: white; padding: 15px 5px; border-radius: 20px; border: 2px solid #f1f5f9; cursor: pointer; text-align: center; transition: 0.2s; }
         .card-team:active { transform: scale(0.9); }
-        .card-team span { font-size: 9px; font-weight: 800; text-transform: uppercase; display: block; margin-top: 5px; }
+        .card-team img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
+        .card-team span { font-size: 9px; font-weight: 800; text-transform: uppercase; display: block; color: #475569; }
 
-        /* Dashboard */
-        header { background: white; padding: 15px 25px; border-bottom: 3px solid var(--team-color); display: flex; justify-content: space-between; align-items: center; sticky: top; }
-        .card-match { background: white; margin: 20px; padding: 25px; border-radius: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 8px solid var(--team-color); }
+        /* App Layout */
+        header { background: white; padding: 15px 25px; border-bottom: 3px solid var(--team-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        .main-container { padding: 20px; max-width: 500px; margin: 0 auto; }
+        .card-match { background: white; padding: 25px; border-radius: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 10px solid var(--team-color); margin-bottom: 20px; }
         
-        /* Tabela Dinâmica */
-        .table-container { background: white; margin: 20px; border-radius: 30px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .t-row { display: grid; grid-template-columns: 30px 1fr 40px 40px; padding: 12px 5px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 700; align-items: center; }
-        .t-header { font-size: 10px; color: #94a3b8; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; }
-        .my-team-row { background: var(--team-light); border-radius: 12px; color: var(--team-color); }
-        
-        /* G4 e Z4 */
-        .libertadores { border-left: 4px solid #2563eb; }
-        .rebaixamento { border-left: 4px solid #ef4444; }
-
-        input { width: 100%; max-width: 300px; padding: 18px; border-radius: 15px; border: 2px solid #f1f5f9; margin-bottom: 10px; outline: none; }
-        .btn { background: #2563eb; color: white; padding: 18px; border-radius: 15px; border: none; width: 100%; max-width: 300px; font-weight: 800; cursor: pointer; }
+        /* Tabela */
+        .table-box { background: white; border-radius: 30px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .t-row { display: grid; grid-template-columns: 30px 1fr 40px 40px; padding: 15px 5px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 700; align-items: center; }
+        .t-row.active { background: var(--team-bg); color: var(--team-color); border-radius: 15px; border-bottom: none; }
+        .g4 { border-left: 4px solid #2563eb; }
+        .z4 { border-left: 4px solid #ef4444; }
     </style>
 </head>
 <body>
 
-    <section id="s-auth" class="screen">
+    <section id="screen-login" class="screen">
         <h1 class="logo">iFut</h1>
-        <p style="color: #94a3b8; font-weight: 800; letter-spacing: 3px; font-size: 10px; margin-bottom: 30px;">BRASILEIRÃO 2026</p>
-        <input type="text" id="in-name" placeholder="Seu nome">
-        <button class="btn" onclick="auth()">Entrar no Estádio</button>
+        <p style="color: #94a3b8; font-weight: 800; letter-spacing: 4px; font-size: 10px;">PREMIUM SYSTEM</p>
+        <div class="input-group">
+            <input type="text" id="user-name-input" placeholder="Nome Completo">
+            <input type="email" id="user-email-input" placeholder="E-mail">
+            <input type="password" id="user-pass-input" placeholder="Senha">
+            <button class="btn-main" onclick="handleLogin()">Criar Conta VIP</button>
+        </div>
     </section>
 
-    <section id="s-onboarding" class="screen hidden" style="justify-content: flex-start; padding-top: 50px;">
-        <h2 style="font-weight: 900; margin: 0;">Escolha seu time</h2>
-        <p style="color: #64748b; font-size: 14px;">A interface mudará para as cores dele.</p>
-        <div id="grid-teams" class="grid-teams"></div>
+    <section id="screen-onboarding" class="screen hidden" style="justify-content: flex-start; padding-top: 40px; overflow-y: auto;">
+        <h2 style="font-weight: 900; margin: 0;">Selecione seu Clube</h2>
+        <p style="color: #64748b; font-size: 13px;">O iFut será personalizado para você.</p>
+        <div id="grid-teams" class="grid-teams" style="padding-bottom: 40px;"></div>
     </section>
 
-    <div id="s-app" class="hidden">
+    <div id="screen-app" class="hidden">
         <header>
-            <span style="font-weight: 900; font-style: italic; color: var(--team-color); font-size: 22px;">iFut</span>
-            <button onclick="logout()" style="background: #f1f5f9; border: none; padding: 8px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; color: #94a3b8;">SAIR</button>
+            <span style="font-weight: 900; font-style: italic; color: var(--team-color); font-size: 24px;">iFut</span>
+            <button onclick="logout()" style="background: #f1f5f9; border: none; padding: 10px; border-radius: 12px; font-weight: 800; color: #94a3b8; font-size: 10px;">SAIR</button>
         </header>
 
-        <div class="card-match">
-            <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin: 0;">PRÓXIMO COMPROMISSO</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <div style="text-align: center;">
-                    <div id="user-shield" style="width: 45px; height: 45px; border-radius: 50%; background: var(--team-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 900; margin-bottom: 5px;"></div>
-                    <span id="user-team-name" style="font-size: 10px; font-weight: 800;"></span>
+        <main class="main-container">
+            <div class="card-match">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin: 0;">PRÓXIMO JOGO</p>
+                    <span id="user-display-name" style="font-size: 10px; font-weight: 900; color: var(--team-color);"></span>
                 </div>
-                <span style="font-weight: 900; font-style: italic; color: #e2e8f0;">VS</span>
-                <div style="text-align: center;">
-                    <div style="width: 45px; height: 45px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; color: #ccc; font-weight: 900; margin-bottom: 5px;">?</div>
-                    <span style="font-size: 10px; font-weight: 800; color: #ccc;">ADVERSÁRIO</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                    <div style="text-align: center;">
+                        <img id="my-shield-img" src="" style="width: 50px; height: 50px; object-fit: contain; margin-bottom: 8px;">
+                        <span id="my-team-label" style="font-size: 10px; font-weight: 900; display: block;"></span>
+                    </div>
+                    <span style="font-weight: 900; font-style: italic; color: #cbd5e1; font-size: 22px;">VS</span>
+                    <div style="text-align: center;">
+                        <div style="width: 50px; height: 50px; background: #eee; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; color: #ccc; font-weight: 900;">?</div>
+                        <span style="font-size: 10px; font-weight: 900; color: #ccc;">OPONENTE</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="table-container">
-            <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin-bottom: 15px;">CLASSIFICAÇÃO SÉRIE A</p>
-            <div class="t-row t-header">
-                <span>#</span><span>Clube</span><span>P</span><span>V</span>
+            <div class="table-box">
+                <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin-bottom: 15px;">CLASSIFICAÇÃO SÉRIE A</p>
+                <div id="table-content"></div>
             </div>
-            <div id="live-table">
-                </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // LISTA OFICIAL SÉRIE A 2026 E PONTOS ATUAIS (SIMULADOS)
+        // Lista Completa 20 Times - Série A 2026 (Com links de logos estáveis)
         const serieA = [
-            { pos: 1, nome: 'Palmeiras', pontos: 12, vitorias: 4, cor: '#059669', bg: '#ecfdf5' },
-            { pos: 2, nome: 'Flamengo', pontos: 10, vitorias: 3, cor: '#dc2626', bg: '#fef2f2' },
-            { pos: 3, nome: 'Botafogo', pontos: 10, vitorias: 3, cor: '#000000', bg: '#f8fafc' },
-            { pos: 4, nome: 'Cruzeiro', pontos: 9, vitorias: 3, cor: '#1d4ed8', bg: '#eff6ff' },
-            { pos: 5, nome: 'Fortaleza', pontos: 8, vitorias: 2, cor: '#1e40af', bg: '#eff6ff' },
-            { pos: 6, nome: 'São Paulo', pontos: 7, vitorias: 2, cor: '#ef4444', bg: '#fef2f2' },
-            { pos: 7, nome: 'Internacional', pontos: 7, vitorias: 2, cor: '#b91c1c', bg: '#fef2f2' },
-            { pos: 8, nome: 'Bahia', pontos: 6, vitorias: 2, cor: '#2563eb', bg: '#eff6ff' },
-            { pos: 9, nome: 'Athletico-PR', pontos: 6, vitorias: 2, cor: '#000000', bg: '#f8fafc' },
-            { pos: 10, nome: 'Atlético-MG', pontos: 5, vitorias: 1, cor: '#111111', bg: '#f8fafc' },
-            { pos: 11, nome: 'Corinthians', pontos: 5, vitorias: 1, cor: '#000000', bg: '#f8fafc' },
-            { pos: 12, nome: 'Grêmio', pontos: 4, vitorias: 1, cor: '#0ea5e9', bg: '#f0f9ff' },
-            { pos: 13, nome: 'Vasco', pontos: 4, vitorias: 1, cor: '#000000', bg: '#f8fafc' },
-            { pos: 14, nome: 'Cuiabá', pontos: 3, vitorias: 1, cor: '#15803d', bg: '#f0fdf4' },
-            { pos: 15, nome: 'Juventude', pontos: 3, vitorias: 1, cor: '#166534', bg: '#f0fdf4' },
-            { pos: 16, nome: 'Bragantino', pontos: 2, vitorias: 0, cor: '#111111', bg: '#f8fafc' },
-            { pos: 17, nome: 'Santos', pontos: 2, vitorias: 0, cor: '#000000', bg: '#f8fafc' },
-            { pos: 18, nome: 'Ceará', pontos: 1, vitorias: 0, cor: '#000000', bg: '#f8fafc' },
-            { pos: 19, nome: 'Sport', pontos: 1, vitorias: 0, cor: '#b91c1c', bg: '#fef2f2' },
-            { pos: 20, nome: 'Vitória', pontos: 0, vitorias: 0, cor: '#ef4444', bg: '#fef2f2' }
+            { pos: 1, nome: 'Botafogo', pts: 12, v: 4, cor: '#000', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Botafogo_de_Futebol_e_Regatas_logo.svg' },
+            { pos: 2, nome: 'Palmeiras', pts: 10, v: 3, cor: '#059669', bg: '#ecfdf5', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Palmeiras_logo.svg' },
+            { pos: 3, nome: 'Flamengo', pts: 10, v: 3, cor: '#dc2626', bg: '#fef2f2', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_brazilian_v_box.svg' },
+            { pos: 4, nome: 'Fortaleza', pts: 9, v: 3, cor: '#1d4ed8', bg: '#eff6ff', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/41/Fortaleza_Esporte_Clube_logo.svg' },
+            { pos: 5, nome: 'Cruzeiro', pts: 9, v: 3, cor: '#1d4ed8', bg: '#eff6ff', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Cruzeiro_Esporte_Clube_v_box.svg' },
+            { pos: 6, nome: 'Internacional', pts: 7, v: 2, cor: '#b91c1c', bg: '#fef2f2', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f1/Escudo_do_Sport_Club_Internacional.svg' },
+            { pos: 7, nome: 'São Paulo', pts: 7, v: 2, cor: '#ef4444', bg: '#fef2f2', logo: 'https://upload.wikimedia.org/wikipedia/pt/4/4b/S%C3%A3o_Paulo_Futebol_Clube.svg' },
+            { pos: 8, nome: 'Bahia', pts: 6, v: 2, cor: '#2563eb', bg: '#eff6ff', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/00/Esporte_Clube_Bahia_logo.svg' },
+            { pos: 9, nome: 'Corinthians', pts: 6, v: 2, cor: '#111', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/pt/b/b4/Corinthians_simbolo.svg' },
+            { pos: 10, nome: 'Atlético-MG', pts: 5, v: 1, cor: '#000', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5f/Atletico_mineiro_v_box.svg' },
+            { pos: 11, nome: 'Vasco', pts: 4, v: 1, cor: '#000', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/pt/a/ac/CRVascoDaGama.svg' },
+            { pos: 12, nome: 'Vitória', pts: 4, v: 1, cor: '#dc2626', bg: '#fef2f2', logo: 'https://upload.wikimedia.org/wikipedia/pt/7/70/Esporte_Clube_Vit%C3%B3ria_logo.svg' },
+            { pos: 13, nome: 'Grêmio', pts: 4, v: 1, cor: '#0ea5e9', bg: '#f0f9ff', logo: 'https://upload.wikimedia.org/wikipedia/pt/f/f8/Gr%C3%A9mio_FBPA.svg' },
+            { pos: 14, nome: 'Santos', pts: 3, v: 1, cor: '#000', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/35/Santos_logo.svg' },
+            { pos: 15, nome: 'Cuiabá', pts: 3, v: 1, cor: '#15803d', bg: '#f0fdf4', logo: 'https://upload.wikimedia.org/wikipedia/pt/c/c7/Cuiab%C3%A1EC2020.png' },
+            { pos: 16, nome: 'Criciúma', pts: 2, v: 0, cor: '#facc15', bg: '#fefce8', logo: 'https://upload.wikimedia.org/wikipedia/pt/3/35/Crici%C3%BAma_Esporte_Clube_logo.png' },
+            { pos: 17, nome: 'Bragantino', pts: 2, v: 0, cor: '#000', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/pt/9/9e/Red_Bull_Bragantino.svg' },
+            { pos: 18, nome: 'Juventude', pts: 1, v: 0, cor: '#166534', bg: '#f0fdf4', logo: 'https://upload.wikimedia.org/wikipedia/pt/3/36/Esporte_Clube_Juventude.svg' },
+            { pos: 19, nome: 'Ceará', pts: 1, v: 0, cor: '#000', bg: '#f1f5f9', logo: 'https://upload.wikimedia.org/wikipedia/pt/0/03/Cear%C3%A1_Sporting_Club_logo.svg' },
+            { pos: 20, nome: 'Sport', pts: 0, v: 0, cor: '#b91c1c', bg: '#fef2f2', logo: 'https://upload.wikimedia.org/wikipedia/pt/1/17/Sport_Club_do_Recife.svg' }
         ];
 
-        function auth() {
-            const name = document.getElementById('in-name').value;
-            if(!name) return;
-            localStorage.setItem('ifut_user', name);
-            showOnboarding();
+        function handleLogin() {
+            const name = document.getElementById('user-name-input').value;
+            const email = document.getElementById('user-email-input').value;
+            const pass = document.getElementById('user-pass-input').value;
+
+            if(!name || !email || !pass) return alert("Preencha todos os campos!");
+            
+            localStorage.setItem('ifut_user_name', name.split(' ')[0]);
+            checkState();
         }
 
-        function showOnboarding() {
-            document.getElementById('s-auth').classList.add('hidden');
-            document.getElementById('s-onboarding').classList.remove('hidden');
+        function checkState() {
+            const name = localStorage.getItem('ifut_user_name');
+            const team = localStorage.getItem('ifut_user_team');
+
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-onboarding').classList.add('hidden');
+            document.getElementById('screen-app').classList.add('hidden');
+
+            if(!name) {
+                document.getElementById('screen-login').classList.remove('hidden');
+            } else if(!team) {
+                document.getElementById('screen-onboarding').classList.remove('hidden');
+                renderOnboarding();
+            } else {
+                document.getElementById('screen-app').classList.remove('hidden');
+                renderDashboard(JSON.parse(team));
+            }
+        }
+
+        function renderOnboarding() {
             const grid = document.getElementById('grid-teams');
             grid.innerHTML = '';
             serieA.forEach(t => {
-                const btn = document.createElement('div');
-                btn.className = 'card-team';
-                btn.innerHTML = `<div style="width:25px; height:25px; background:${t.cor}; margin:0 auto; border-radius:5px;"></div><span>${t.nome}</span>`;
-                btn.onclick = () => selectTeam(t);
-                grid.appendChild(btn);
+                const item = document.createElement('div');
+                item.className = 'card-team';
+                item.innerHTML = `<img src="${t.logo}" onerror="this.src='https://via.placeholder.com/40?text=🛡️'"><span>${t.nome}</span>`;
+                item.onclick = () => {
+                    localStorage.setItem('ifut_user_team', JSON.stringify(t));
+                    checkState();
+                };
+                grid.appendChild(item);
             });
         }
 
-        function selectTeam(time) {
-            localStorage.setItem('ifut_team', JSON.stringify(time));
-            renderApp();
-        }
-
-        function renderApp() {
-            const time = JSON.parse(localStorage.getItem('ifut_team'));
-            document.getElementById('s-onboarding').classList.add('hidden');
-            document.getElementById('s-app').classList.remove('hidden');
+        function renderDashboard(team) {
+            document.documentElement.style.setProperty('--team-color', team.cor);
+            document.documentElement.style.setProperty('--team-bg', team.bg);
             
-            // Estilo dinâmico
-            document.documentElement.style.setProperty('--team-color', time.cor);
-            document.documentElement.style.setProperty('--team-light', time.bg);
-            
-            document.getElementById('user-team-name').innerText = time.nome.toUpperCase();
-            document.getElementById('user-shield').innerText = time.nome.charAt(0);
+            document.getElementById('user-display-name').innerText = `OLÁ, ${localStorage.getItem('ifut_user_name').toUpperCase()}`;
+            document.getElementById('my-shield-img').src = team.logo;
+            document.getElementById('my-team-label').innerText = team.nome.toUpperCase();
 
-            // Renderiza Tabela
-            const tableBody = document.getElementById('live-table');
-            tableBody.innerHTML = '';
+            const table = document.getElementById('table-content');
+            table.innerHTML = '';
             serieA.forEach(t => {
-                const isMyTeam = t.nome === time.nome;
-                const lib = t.pos <= 6 ? 'libertadores' : '';
-                const reb = t.pos >= 17 ? 'rebaixamento' : '';
-                
-                tableBody.innerHTML += `
-                    <div class="t-row ${isMyTeam ? 'my-team-row' : ''} ${lib} ${reb}">
+                const isMine = t.nome === team.nome;
+                const type = t.pos <= 4 ? 'g4' : (t.pos >= 17 ? 'z4' : '');
+                table.innerHTML += `
+                    <div class="t-row ${isMine ? 'active' : ''} ${type}">
                         <span>${t.pos}</span>
                         <span>${t.nome}</span>
-                        <span>${t.pontos}</span>
-                        <span style="color:#94a3b8">${t.vitorias}</span>
+                        <span>${t.pts}</span>
+                        <span style="color:#cbd5e1">${t.v}</span>
                     </div>
                 `;
             });
         }
 
         function logout() { localStorage.clear(); location.reload(); }
-
-        window.onload = () => {
-            if(localStorage.getItem('ifut_team')) renderApp();
-            else if(localStorage.getItem('ifut_user')) showOnboarding();
-        };
+        window.onload = checkState;
     </script>
 </body>
 </html>
