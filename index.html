@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iFut - Série A 2026</title>
+    <title>iFut - Live API</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --team-color: #2563eb; --team-bg: #eff6ff; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f8fafc; margin: 0; color: #0f172a; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f8fafc; margin: 0; color: #0f172a; }
         .hidden { display: none !important; }
 
-        /* Login Screen */
+        /* Auth & Loading */
         .screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; box-sizing: border-box; }
         .logo-font { font-size: 55px; font-weight: 900; font-style: italic; color: #2563eb; letter-spacing: -3px; margin: 0; }
+        .loader { width: 30px; height: 30px; border: 4px solid #f3f3f3; border-top: 4px solid var(--team-color); border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Form */
         .input-box { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
-        input { padding: 18px; border-radius: 18px; border: 2px solid #f1f5f9; font-weight: 600; outline: none; transition: 0.3s; font-size: 16px; }
-        .btn-main { background: #2563eb; color: white; padding: 20px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        input { padding: 18px; border-radius: 18px; border: 2px solid #f1f5f9; font-weight: 600; outline: none; font-size: 16px; }
+        .btn-main { background: #2563eb; color: white; padding: 20px; border-radius: 18px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-        /* Onboarding */
-        .grid-teams { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 450px; margin-top: 25px; }
-        .card-team { background: white; padding: 15px 5px; border-radius: 22px; border: 2px solid #f1f5f9; cursor: pointer; text-align: center; transition: 0.2s; }
-        .shield-mini { width: 35px; height: 35px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 14px; }
-        .card-team span { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #475569; }
-
-        /* Dashboard */
+        /* App Layout */
         header { background: white; padding: 15px 25px; border-bottom: 4px solid var(--team-color); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
         .main-content { padding: 20px; max-width: 500px; margin: 0 auto; }
-        .card-match { background: white; padding: 25px; border-radius: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 10px solid var(--team-color); margin-bottom: 20px; }
         
-        /* Tabela */
+        /* Tabela API */
         .table-box { background: white; border-radius: 30px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .t-row { display: grid; grid-template-columns: 30px 1fr 40px 40px; padding: 15px 5px; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 700; align-items: center; }
+        .t-row { display: grid; grid-template-columns: 35px 35px 1fr 35px 35px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 700; align-items: center; }
+        .t-row img { width: 22px; height: 22px; object-fit: contain; }
         .t-row.active { background: var(--team-bg); color: var(--team-color); border-radius: 15px; border-bottom: none; }
+        
         .g4 { border-left: 4px solid #2563eb; }
         .z4 { border-left: 4px solid #ef4444; }
     </style>
@@ -40,145 +39,126 @@
 
     <section id="scr-login" class="screen">
         <h1 class="logo-font">iFut</h1>
-        <p style="color: #94a3b8; font-weight: 800; letter-spacing: 4px; font-size: 10px;">BRASILEIRÃO 2026</p>
+        <p style="color: #94a3b8; font-weight: 800; letter-spacing: 4px; font-size: 10px;">LIVE API SYSTEM</p>
         <div class="input-box">
-            <input type="text" id="user-name" placeholder="Nome">
+            <input type="text" id="user-name" placeholder="Seu Nome">
             <input type="email" id="user-email" placeholder="E-mail">
-            <input type="password" id="user-pass" placeholder="Senha">
-            <button class="btn-main" onclick="doLogin()">Acessar Conta VIP</button>
+            <button class="btn-main" onclick="doLogin()">Entrar</button>
         </div>
+    </section>
+
+    <section id="scr-loading" class="screen hidden">
+        <h2 style="font-weight: 900;">Sincronizando Dados...</h2>
+        <div class="loader"></div>
     </section>
 
     <section id="scr-onboarding" class="screen hidden" style="justify-content: flex-start; padding-top: 50px; overflow-y: auto;">
         <h2 style="font-weight: 900; margin: 0;">Seu Time</h2>
-        <p style="color: #64748b; font-size: 13px;">Personalize sua experiência</p>
-        <div id="team-list" class="grid-teams" style="padding-bottom: 40px;"></div>
+        <div id="team-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 25px;"></div>
     </section>
 
     <div id="scr-app" class="hidden">
         <header>
-            <span style="font-weight: 900; font-style: italic; color: var(--team-color); font-size: 26px;">iFut</span>
-            <button onclick="doLogout()" style="background: #f1f5f9; border: none; padding: 10px; border-radius: 12px; font-weight: 800; color: #94a3b8; font-size: 10px;">SAIR</button>
+            <span style="font-weight: 900; font-style: italic; color: var(--team-color); font-size: 24px;">iFut</span>
+            <button onclick="logout()" style="background: #f1f5f9; border: none; padding: 10px; border-radius: 12px; font-weight: 800; color: #94a3b8; font-size: 10px;">SAIR</button>
         </header>
 
         <main class="main-content">
-            <div class="card-match">
-                <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin: 0;">MEU PERFIL TORCEDOR</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                    <div style="text-align: center;">
-                        <div id="my-shield" class="shield-mini" style="width: 55px; height: 55px; font-size: 20px; background: var(--team-color);"></div>
-                        <span id="my-team-name" style="font-size: 11px; font-weight: 900;"></span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span id="display-user-name" style="font-weight: 900; color: var(--team-color); display: block;"></span>
-                        <span style="font-size: 10px; font-weight: 700; color: #94a3b8;">PLANO VIP ATIVO</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="table-box">
-                <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin-bottom: 15px;">CLASSIFICAÇÃO OFICIAL</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <p style="font-size: 10px; font-weight: 900; color: #94a3b8; margin: 0;">TABELA EM TEMPO REAL</p>
+                    <span style="font-size: 10px; font-weight: 900; color: #22c55e;">● LIVE</span>
+                </div>
                 <div id="table-data"></div>
             </div>
         </main>
     </div>
 
     <script>
-        // DATA BASE OFICIAL SÉRIE A 2026 (SUA LISTA)
-        const serieA = [
-            { pos: 1, nome: 'RB Bragantino', pts: 6, j: 2, v: 2, s: 2, cor: '#000', bg: '#f1f5f9' },
-            { pos: 2, nome: 'Palmeiras', pts: 4, j: 2, v: 1, s: 4, cor: '#059669', bg: '#ecfdf5' },
-            { pos: 3, nome: 'Chapecoense', pts: 4, j: 2, v: 1, s: 2, cor: '#166534', bg: '#f0fdf4' },
-            { pos: 4, nome: 'Mirassol', pts: 4, j: 2, v: 1, s: 1, cor: '#facc15', bg: '#fefce8' },
-            { pos: 5, nome: 'São Paulo', pts: 4, j: 2, v: 1, s: 1, cor: '#ef4444', bg: '#fef2f2' },
-            { pos: 6, nome: 'Fluminense', pts: 4, j: 2, v: 1, s: 1, cor: '#991b1b', bg: '#fef2f2' },
-            { pos: 7, nome: 'Bahia', pts: 4, j: 2, v: 1, s: 1, cor: '#2563eb', bg: '#eff6ff' },
-            { pos: 8, nome: 'Botafogo', pts: 3, j: 2, v: 1, s: 2, cor: '#000', bg: '#f1f5f9' },
-            { pos: 9, nome: 'Grêmio', pts: 3, j: 2, v: 1, s: 1, cor: '#0ea5e9', bg: '#f0f9ff' },
-            { pos: 10, nome: 'Athletico-PR', pts: 3, j: 1, v: 1, s: 1, cor: '#c2410c', bg: '#fff7ed' },
-            { pos: 11, nome: 'Coritiba', pts: 3, j: 2, v: 1, s: 0, cor: '#15803d', bg: '#f0fdf4' },
-            { pos: 12, nome: 'Vitória', pts: 3, j: 2, v: 1, s: -2, cor: '#dc2626', bg: '#fef2f2' },
-            { pos: 13, nome: 'Vasco', pts: 1, j: 2, v: 0, s: -1, cor: '#000', bg: '#f1f5f9' },
-            { pos: 14, nome: 'Flamengo', pts: 1, j: 2, v: 0, s: -1, cor: '#dc2626', bg: '#fef2f2' },
-            { pos: 15, nome: 'Atlético-MG', pts: 1, j: 2, v: 0, s: -1, cor: '#111', bg: '#f1f5f9' },
-            { pos: 16, nome: 'Internacional', pts: 1, j: 2, v: 0, s: -1, cor: '#b91c1c', bg: '#fef2f2' },
-            { pos: 17, nome: 'Santos', pts: 1, j: 2, v: 0, s: -2, cor: '#000', bg: '#f1f5f9' },
-            { pos: 18, nome: 'Remo', pts: 1, j: 2, v: 0, s: -2, cor: '#1e3a8a', bg: '#eff6ff' },
-            { pos: 19, nome: 'Corinthians', pts: 0, j: 1, v: 0, s: -1, cor: '#000', bg: '#f1f5f9' },
-            { pos: 20, nome: 'Cruzeiro', pts: 0, j: 2, v: 0, s: -5, cor: '#1d4ed8', bg: '#eff6ff' }
-        ];
+        const API_KEY = '73dfca95e9552af'; // Sua chave
+        let fullStandings = [];
+
+        async function fetchStandings() {
+            try {
+                const response = await fetch('https://v3.football.api-sports.io/standings?league=71&season=2026', {
+                    method: 'GET',
+                    headers: { 'x-rapidapi-host': 'v3.football.api-sports.io', 'x-rapidapi-key': API_KEY }
+                });
+                const data = await response.json();
+                return data.response[0].league.standings[0];
+            } catch (e) {
+                alert("Erro ao conectar com a API. Verifique sua chave!");
+            }
+        }
 
         function doLogin() {
-            const n = document.getElementById('user-name').value;
-            const e = document.getElementById('user-email').value;
-            const p = document.getElementById('user-pass').value;
-            if(!n || !e || !p) return alert("Preencha tudo!");
-            localStorage.setItem('ifut_name', n);
-            checkAppStatus();
+            const name = document.getElementById('user-name').value;
+            if(!name) return alert("Digite seu nome!");
+            localStorage.setItem('ifut_name', name);
+            initApp();
         }
 
-        function selectMyTeam(t) {
-            localStorage.setItem('ifut_team_data', JSON.stringify(t));
-            checkAppStatus();
-        }
-
-        function checkAppStatus() {
+        async function initApp() {
             const name = localStorage.getItem('ifut_name');
-            const team = localStorage.getItem('ifut_team_data');
+            const team = localStorage.getItem('ifut_team');
+
+            if(!name) return;
 
             document.getElementById('scr-login').classList.add('hidden');
-            document.getElementById('scr-onboarding').classList.add('hidden');
-            document.getElementById('scr-app').classList.add('hidden');
+            document.getElementById('scr-loading').classList.remove('hidden');
 
-            if(!name) {
-                document.getElementById('scr-login').classList.remove('hidden');
-            } else if(!team) {
-                document.getElementById('scr-onboarding').classList.remove('hidden');
-                renderTeamsOnboarding();
+            fullStandings = await fetchStandings();
+            document.getElementById('scr-loading').classList.add('hidden');
+
+            if(!team) {
+                renderOnboarding();
             } else {
-                document.getElementById('scr-app').classList.remove('hidden');
                 renderDashboard(JSON.parse(team));
             }
         }
 
-        function renderTeamsOnboarding() {
-            const grid = document.getElementById('team-list');
+        function renderOnboarding() {
+            document.getElementById('scr-onboarding').classList.remove('hidden');
+            const grid = document.getElementById('team-grid');
             grid.innerHTML = '';
-            serieA.forEach(t => {
-                const card = document.createElement('div');
-                card.className = 'card-team';
-                card.innerHTML = `<div class="shield-mini" style="background:${t.cor}">${t.nome.charAt(0)}</div><span>${t.nome}</span>`;
-                card.onclick = () => selectMyTeam(t);
-                grid.appendChild(card);
+            fullStandings.forEach(item => {
+                const btn = document.createElement('div');
+                btn.style = "background:white; padding:15px; border-radius:20px; text-align:center; cursor:pointer; border:2px solid #f1f5f9;";
+                btn.innerHTML = `<img src="${item.team.logo}" style="width:30px; margin-bottom:5px;"><br><span style="font-size:9px; font-weight:800;">${item.team.name}</span>`;
+                btn.onclick = () => {
+                    localStorage.setItem('ifut_team', JSON.stringify(item.team));
+                    location.reload();
+                };
+                grid.appendChild(btn);
             });
         }
 
-        function renderDashboard(team) {
-            document.documentElement.style.setProperty('--team-color', team.cor);
-            document.documentElement.style.setProperty('--team-bg', team.bg);
-            
-            document.getElementById('display-user-name').innerText = localStorage.getItem('ifut_name').toUpperCase();
-            document.getElementById('my-team-name').innerText = team.nome.toUpperCase();
-            document.getElementById('my-shield').innerText = team.nome.charAt(0);
-
+        function renderDashboard(myTeam) {
+            document.getElementById('scr-app').classList.remove('hidden');
             const table = document.getElementById('table-data');
             table.innerHTML = '';
-            serieA.forEach(t => {
-                const isMine = t.nome === team.nome;
-                const zone = t.pos <= 4 ? 'g4' : (t.pos >= 17 ? 'z4' : '');
+
+            fullStandings.forEach(t => {
+                const isMine = t.team.id === myTeam.id;
+                const zone = t.rank <= 4 ? 'g4' : (t.rank >= 17 ? 'z4' : '');
+                
                 table.innerHTML += `
                     <div class="t-row ${isMine ? 'active' : ''} ${zone}">
-                        <span>${t.pos}</span>
-                        <span>${t.nome}</span>
-                        <span>${t.pts}</span>
-                        <span style="color:#cbd5e1">${t.s >= 0 ? '+'+t.s : t.s}</span>
+                        <span style="color:#94a3b8; text-align:center">${t.rank}</span>
+                        <img src="${t.team.logo}">
+                        <span style="margin-left:10px">${t.team.name}</span>
+                        <span style="text-align:center">${t.points}</span>
+                        <span style="color:#cbd5e1; text-align:center">${t.goalsDiff}</span>
                     </div>
                 `;
             });
         }
 
-        function doLogout() { localStorage.clear(); location.reload(); }
-        window.onload = checkAppStatus;
+        function logout() { localStorage.clear(); location.reload(); }
+        
+        window.onload = () => {
+            if(localStorage.getItem('ifut_name')) initApp();
+        };
     </script>
 </body>
 </html>
